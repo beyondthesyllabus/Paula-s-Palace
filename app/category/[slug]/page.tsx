@@ -5,6 +5,11 @@ import { formatPrice } from "@/lib/utils";
 import { notFound } from "next/navigation";
 
 async function getCategoryWithProducts(slug: string) {
+  if (!process.env.DATABASE_URL) {
+    console.log("No database configured");
+    return null;
+  }
+  
   try {
     const category = await prisma.category.findUnique({
       where: { slug },
@@ -33,81 +38,86 @@ export default async function CategoryPage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Category Header */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-4">{category.name}</h1>
-        {category.description && (
-          <p className="text-xl text-gray-600">{category.description}</p>
-        )}
-        <p className="text-gray-500 mt-2">
-          {category.products.length} {category.products.length === 1 ? "product" : "products"}
-        </p>
-      </div>
-
-      {/* Products Grid */}
-      {category.products.length === 0 ? (
-        <div className="text-center py-16">
-          <p className="text-xl text-gray-500 mb-4">
-            No products available in this category yet.
-          </p>
-          <Link
-            href="/"
-            className="text-primary-600 hover:text-primary-700 font-semibold"
-          >
-            Continue Shopping
-          </Link>
+    <div className="bg-cream-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        {/* Category Header */}
+        <div className="mb-20 text-center">
+          <span className="text-gold-600 font-bold tracking-[0.2em] uppercase text-sm mb-4 block">
+            Collection
+          </span>
+          <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6">{category.name}</h1>
+          {category.description && (
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">{category.description}</p>
+          )}
+          <div className="mt-8 flex items-center justify-center space-x-4">
+            <div className="h-px w-12 bg-gold-300"></div>
+            <p className="text-gold-700 font-medium uppercase tracking-widest text-xs">
+              {category.products.length} {category.products.length === 1 ? "Exquisite Piece" : "Exquisite Pieces"}
+            </p>
+            <div className="h-px w-12 bg-gold-300"></div>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {category.products.map((product) => {
-            const images = JSON.parse(product.images);
-            return (
-              <Link
-                key={product.id}
-                href={`/product/${product.slug}`}
-                className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all overflow-hidden"
-              >
-                <div className="aspect-square relative bg-gray-100">
-                  <Image
-                    src={images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  {product.featured && (
-                    <div className="absolute top-2 right-2 bg-primary-600 text-white text-xs font-bold px-2 py-1 rounded">
-                      FEATURED
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-2 group-hover:text-primary-600 transition line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <p className="text-primary-600 font-bold text-xl">
-                      {formatPrice(product.price)}
-                    </p>
-                    {product.stock > 0 ? (
-                      <span className="text-green-600 text-sm font-medium">
-                        In Stock
-                      </span>
-                    ) : (
-                      <span className="text-red-600 text-sm font-medium">
-                        Out of Stock
-                      </span>
+
+        {/* Products Grid */}
+        {category.products.length === 0 ? (
+          <div className="text-center py-24 bg-white rounded-3xl shadow-sm border border-cream-200">
+            <p className="text-2xl font-serif text-gray-400 mb-8">
+              The collection is currently being curated.
+            </p>
+            <Link
+              href="/"
+              className="inline-flex items-center space-x-2 bg-primary-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl"
+            >
+              <span>Discover Other Collections</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+            {category.products.map((product) => {
+              const images = JSON.parse(product.images);
+              return (
+                <Link
+                  key={product.id}
+                  href={`/product/${product.slug}`}
+                  className="group flex flex-col h-full"
+                >
+                  <div className="aspect-[4/5] relative bg-white rounded-2xl overflow-hidden mb-6 shadow-md group-hover:shadow-2xl transition-all duration-500">
+                    <Image
+                      src={images[0]}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    {product.featured && (
+                      <div className="absolute top-4 right-4 bg-gold-500/90 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+                        LIMITED EDITION
+                      </div>
+                    )}
+                    {product.stock <= 0 && (
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center">
+                        <span className="bg-gray-900 text-white px-4 py-1 text-xs font-bold rounded-full">SOLD OUT</span>
+                      </div>
                     )}
                   </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+                  <div className="text-center flex-1 flex flex-col px-2">
+                    <h3 className="font-serif text-lg text-gray-900 mb-2 group-hover:text-primary-600 transition line-clamp-1">
+                      {product.name}
+                    </h3>
+                    <p className="text-primary-600 font-bold text-lg mt-auto">
+                      {formatPrice(product.price)}
+                    </p>
+                    <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-gold-600 text-xs font-bold uppercase tracking-widest border-b border-gold-300 pb-1">
+                        View Details
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -5,6 +5,11 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 
 async function getOrder(orderNumber: string) {
+  if (!process.env.DATABASE_URL) {
+    console.log("No database configured");
+    return null;
+  }
+  
   try {
     const order = await prisma.order.findUnique({
       where: { orderNumber },

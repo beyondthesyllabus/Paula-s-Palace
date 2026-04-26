@@ -4,6 +4,11 @@ import { notFound } from "next/navigation";
 import { ProductClient } from "./ProductClient";
 
 async function getProduct(slug: string) {
+  if (!process.env.DATABASE_URL) {
+    console.log("No database configured");
+    return null;
+  }
+  
   try {
     const product = await prisma.product.findUnique({
       where: { slug },

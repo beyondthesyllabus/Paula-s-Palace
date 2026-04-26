@@ -2,8 +2,9 @@
 
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -11,14 +12,16 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   : null;
 
 export default function CheckoutPage() {
+  const { data: session, status } = useSession();
   const { cart, getCartTotal, clearCart } = useCart();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | "cod">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "paypal" | "cod" | "bank_transfer" | "crypto">("cod");
+  const [cryptoWallet, setCryptoWallet] = useState("");
 
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    name: session?.user?.name || "",
+    email: session?.user?.email || "",
     phone: "",
     address: "",
     city: "",
@@ -123,6 +126,77 @@ export default function CheckoutPage() {
       } else if (paymentMethod === "paypal") {
         // PayPal Payment
         alert("PayPal integration coming soon! Please use Cash on Delivery or Stripe.");
+      } else if (paymentMethod === "bank_transfer") {
+        // Bank Transfer Payment
+        const response = await fetch("/api/checkout/bank-transfer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: session?.user?.id,
+            customerName: formData.name,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            shippingAddress: {
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              zip: formData.zip,
+              country: formData.country,
+            },
+            items: cart,
+            subtotal,
+            shipping,
+            total,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          clearCart();
+          router.push(`/bank-transfer-instructions/${data.orderNumber}?reference=${data.bankReference}`);
+        } else {
+          alert(data.error || "Failed to create order");
+        }
+      } else if (paymentMethod === "crypto") {
+        // Crypto Payment
+        if (!cryptoWallet) {
+          alert("Please enter your crypto wallet address");
+          setLoading(false);
+          return;
+        }
+
+        const response = await fetch("/api/checkout/crypto", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: session?.user?.id,
+            customerName: formData.name,
+            customerEmail: formData.email,
+            customerPhone: formData.phone,
+            shippingAddress: {
+              address: formData.address,
+              city: formData.city,
+              state: formData.state,
+              zip: formData.zip,
+              country: formData.country,
+            },
+            items: cart,
+            subtotal,
+            shipping,
+            total,
+            cryptoWallet,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          clearCart();
+          router.push(`/crypto-payment-instructions/${data.orderNumber}?address=${data.cryptoAddress}&amount=${data.amount}`);
+        } else {
+          alert(data.error || "Failed to create order");
+        }
       }
     } catch (error) {
       console.error("Checkout error:", error);
@@ -309,6 +383,48 @@ export default function CheckoutPage() {
                   />
                   <span className="ml-3 font-medium">PayPal (Coming Soon)</span>
                 </label>
+                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:border-primary-300 transition">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="bank_transfer"
+                    checked={paymentMethod === "bank_transfer"}
+                    onChange={(e) => setPaymentMethod(e.target.value as any)}
+                    className="w-4 h-4 text-primary-600"
+                  />
+                  <span className="ml-3 font-medium">Bank Transfer</span>
+                </label>
+                <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:border-primary-300 transition">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="crypto"
+                    checked={paymentMethod === "crypto"}
+                    onChange={(e) => setPaymentMethod(e.target.value as any)}
+                    className="w-4 h-4 text-primary-600"
+                  />
+                  <span className="ml-3 font-medium">Cryptocurrency</span>
+                </label>
+                
+                {/* Crypto Wallet Input - Show only when crypto is selected */}
+                {paymentMethod === "crypto" && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Your Crypto Wallet Address
+                    </label>
+                    <input
+                      type="text"
+                      value={cryptoWallet}
+                      onChange={(e) => setCryptoWallet(e.target.value)}
+                      placeholder="Enter your wallet address (BTC, ETH, etc.)"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      required
+                    />
+                    <p className="mt-2 text-sm text-gray-600">
+                      We accept Bitcoin, Ethereum, and other major cryptocurrencies.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

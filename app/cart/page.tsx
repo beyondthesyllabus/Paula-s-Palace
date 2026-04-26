@@ -4,24 +4,27 @@ import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingCart } from "lucide-react";
 
 export default function CartPage() {
   const { cart, removeFromCart, updateQuantity, getCartTotal } = useCart();
 
   if (cart.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Your Cart is Empty</h1>
-          <p className="text-gray-600 mb-8">
-            Add some products to your cart to get started!
+      <div className="bg-cream-50 min-h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center bg-white p-12 rounded-[3rem] shadow-2xl border border-cream-200">
+          <div className="w-24 h-24 bg-cream-50 rounded-full flex items-center justify-center mx-auto mb-8">
+            <ShoppingCart className="w-10 h-10 text-gold-500" />
+          </div>
+          <h1 className="text-3xl font-serif font-bold text-neutral-900 mb-4">Your Collection is Empty</h1>
+          <p className="text-neutral-500 mb-10 leading-relaxed">
+            Every great journey begins with a single step. Discover our curated collections and start your legacy today.
           </p>
           <Link
             href="/"
-            className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
+            className="inline-block bg-primary-500 text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-primary-600 transition-all shadow-xl hover:shadow-primary-100"
           >
-            Continue Shopping
+            Explore Collections
           </Link>
         </div>
       </div>
@@ -33,126 +36,140 @@ export default function CartPage() {
   const total = subtotal + shipping;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+    <div className="bg-cream-50 min-h-screen py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-12">
+          <h1 className="text-5xl font-serif font-bold text-neutral-900">Your Boutique Cart</h1>
+          <div className="w-20 h-1 bg-gold-400 mt-4"></div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Cart Items */}
-        <div className="lg:col-span-2 space-y-4">
-          {cart.map((item) => (
-            <div
-              key={`${item.productId}-${item.size}`}
-              className="bg-white rounded-lg shadow-md p-4 flex gap-4"
-            >
-              <Link
-                href={`/product/${item.slug}`}
-                className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden"
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 xl:gap-16">
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-6">
+            {cart.map((item) => (
+              <div
+                key={`${item.productId}-${item.size}`}
+                className="bg-white rounded-3xl shadow-sm border border-cream-100 p-6 flex gap-6 group hover:shadow-xl transition-all duration-500"
               >
-                <Image
-                  src={item.image}
-                  alt={item.name}
-                  fill
-                  className="object-cover"
-                />
-              </Link>
-
-              <div className="flex-1">
                 <Link
                   href={`/product/${item.slug}`}
-                  className="font-semibold text-lg hover:text-primary-600 transition"
+                  className="relative w-32 h-40 flex-shrink-0 bg-cream-50 rounded-2xl overflow-hidden shadow-inner"
                 >
-                  {item.name}
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
                 </Link>
-                <p className="text-gray-600 text-sm">Size: {item.size}</p>
-                <p className="text-primary-600 font-bold mt-1">
-                  {formatPrice(item.price)}
-                </p>
 
-                <div className="flex items-center gap-4 mt-3">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() =>
-                        updateQuantity(
-                          item.productId,
-                          item.size,
-                          item.quantity - 1
-                        )
-                      }
-                      className="w-8 h-8 rounded border-2 border-gray-300 hover:border-primary-600 flex items-center justify-center"
+                <div className="flex-1 flex flex-col">
+                  <div className="flex justify-between items-start mb-2">
+                    <Link
+                      href={`/product/${item.slug}`}
+                      className="font-serif text-2xl text-neutral-900 hover:text-primary-500 transition-colors"
                     >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                    <span className="w-12 text-center font-semibold">
-                      {item.quantity}
-                    </span>
+                      {item.name}
+                    </Link>
                     <button
-                      onClick={() =>
-                        updateQuantity(
-                          item.productId,
-                          item.size,
-                          item.quantity + 1
-                        )
-                      }
-                      className="w-8 h-8 rounded border-2 border-gray-300 hover:border-primary-600 flex items-center justify-center"
+                      onClick={() => removeFromCart(item.productId, item.size)}
+                      className="text-neutral-300 hover:text-rose-500 transition-colors p-1"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
+                  
+                  <p className="text-gold-600 font-bold text-xs uppercase tracking-widest mb-4">Size: {item.size}</p>
+                  
+                  <div className="mt-auto flex items-center justify-between">
+                    <div className="flex items-center bg-cream-50 rounded-xl p-1 border border-cream-100">
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.size,
+                            item.quantity - 1
+                          )
+                        }
+                        className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-neutral-400 hover:text-neutral-900"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-12 text-center font-bold text-neutral-900">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() =>
+                          updateQuantity(
+                            item.productId,
+                            item.size,
+                            item.quantity + 1
+                          )
+                        }
+                        className="w-10 h-10 flex items-center justify-center hover:bg-white rounded-lg transition-colors text-neutral-400 hover:text-neutral-900"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                    
+                    <div className="text-right">
+                      <p className="text-xs text-neutral-400 uppercase tracking-widest mb-1">Total</p>
+                      <p className="font-bold text-2xl text-neutral-900">
+                        {formatPrice(item.price * item.quantity)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
 
-                  <button
-                    onClick={() => removeFromCart(item.productId, item.size)}
-                    className="text-red-600 hover:text-red-700 flex items-center gap-1 text-sm font-medium"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Remove
-                  </button>
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-neutral-900 text-white rounded-[2.5rem] shadow-2xl p-10 sticky top-32 border border-neutral-800">
+              <h2 className="text-3xl font-serif font-bold mb-8">Summary</h2>
+
+              <div className="space-y-6 mb-10">
+                <div className="flex justify-between items-center text-neutral-400">
+                  <span className="uppercase tracking-widest text-xs font-bold">Subtotal</span>
+                  <span className="font-bold text-white">{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between items-center text-neutral-400">
+                  <span className="uppercase tracking-widest text-xs font-bold">Shipping</span>
+                  <span className="font-bold text-white">{formatPrice(shipping)}</span>
+                </div>
+                <div className="h-px bg-neutral-800"></div>
+                <div className="flex justify-between items-center text-xl">
+                  <span className="font-serif font-bold">Total</span>
+                  <span className="font-bold text-gold-400">
+                    {formatPrice(total)}
+                  </span>
                 </div>
               </div>
 
-              <div className="text-right">
-                <p className="font-bold text-lg">
-                  {formatPrice(item.price * item.quantity)}
+              <div className="space-y-4">
+                <Link
+                  href="/checkout"
+                  className="block w-full bg-primary-500 text-white text-center py-5 rounded-2xl font-bold uppercase tracking-widest hover:bg-primary-600 transition-all shadow-xl hover:shadow-primary-900/50"
+                >
+                  Checkout
+                </Link>
+
+                <Link
+                  href="/"
+                  className="block w-full text-center py-3 text-neutral-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+                >
+                  Continue Shopping
+                </Link>
+              </div>
+              
+              <div className="mt-10 pt-10 border-t border-neutral-800">
+                <p className="text-[10px] text-neutral-500 uppercase tracking-widest text-center leading-loose">
+                  Secure encrypted checkout<br />
+                  Complimentary returns included
                 </p>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Order Summary */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
-            <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-
-            <div className="space-y-3 mb-4">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="font-semibold">{formatPrice(subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Shipping</span>
-                <span className="font-semibold">{formatPrice(shipping)}</span>
-              </div>
-              <div className="border-t pt-3 flex justify-between text-lg">
-                <span className="font-bold">Total</span>
-                <span className="font-bold text-primary-600">
-                  {formatPrice(total)}
-                </span>
-              </div>
-            </div>
-
-            <Link
-              href="/checkout"
-              className="block w-full bg-primary-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
-            >
-              Proceed to Checkout
-            </Link>
-
-            <Link
-              href="/"
-              className="block w-full text-center py-3 text-primary-600 hover:text-primary-700 font-medium mt-2"
-            >
-              Continue Shopping
-            </Link>
           </div>
         </div>
       </div>
