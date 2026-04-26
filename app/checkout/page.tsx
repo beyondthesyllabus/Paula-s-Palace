@@ -132,7 +132,7 @@ export default function CheckoutPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: session?.user?.id,
+            userId: (session?.user as any)?.id,
             customerName: formData.name,
             customerEmail: formData.email,
             customerPhone: formData.phone,
@@ -170,7 +170,7 @@ export default function CheckoutPage() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: session?.user?.id,
+            userId: (session?.user as any)?.id,
             customerName: formData.name,
             customerEmail: formData.email,
             customerPhone: formData.phone,

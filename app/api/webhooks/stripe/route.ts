@@ -5,7 +5,7 @@ import { sendOrderConfirmation } from "@/lib/email";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVsd;'fgp[ersion: "2024-12-18.acacia",
+      apiVersion: "2023-10-16" as any,
     })
   : null;
 
