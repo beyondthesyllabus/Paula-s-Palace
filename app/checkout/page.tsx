@@ -27,7 +27,7 @@ export default function CheckoutPage() {
     city: "",
     state: "",
     zip: "",
-    country: "United States",
+    country: "Nigeria",
   });
 
   const subtotal = getCartTotal();

@@ -49,7 +49,7 @@ export default function CartPage() {
             {cart.map((item) => (
               <div
                 key={`${item.productId}-${item.size}`}
-                className="bg-white rounded-3xl shadow-sm border border-cream-100 p-6 flex gap-6 group hover:shadow-xl transition-all duration-500"
+                className="bg-white rounded-3xl shadow-sm border border-cream-100 p-6 flex flex-col sm:flex-row gap-6 group hover:shadow-xl transition-all duration-500"
               >
                 <Link
                   href={`/product/${item.slug}`}
