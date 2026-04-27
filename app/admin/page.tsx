@@ -267,9 +267,20 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-50 flex">
-      {/* Sidebar */}
-      <aside className="w-80 bg-white border-r border-cream-200 hidden lg:flex flex-col">
+    <div className="min-h-screen bg-cream-50 flex flex-col lg:flex-row">
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-white border-b border-cream-200 p-6 flex justify-between items-center sticky top-0 z-40">
+        <h2 className="text-xl font-serif font-bold text-primary-500">Paula&apos;s Admin</h2>
+        <button 
+          onClick={handleLogout}
+          className="text-rose-500 p-2 hover:bg-rose-50 rounded-xl transition-colors"
+        >
+          <LogOut className="w-5 h-5" />
+        </button>
+      </header>
+
+      {/* Sidebar (Desktop) */}
+      <aside className="w-80 bg-white border-r border-cream-200 hidden lg:flex flex-col h-screen sticky top-0">
         <div className="p-8">
           <h2 className="text-2xl font-serif font-bold text-primary-500">Paula&apos;s Admin</h2>
         </div>
@@ -308,7 +319,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 lg:p-12 overflow-y-auto h-screen">
+      <main className="flex-1 p-6 md:p-8 lg:p-12 overflow-y-auto">
         <header className="flex justify-between items-end mb-12">
           <div>
             <h1 className="text-4xl font-serif font-bold text-neutral-900 capitalize">{activeTab} Management</h1>
@@ -672,6 +683,31 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+      {/* Mobile Bottom Navigation */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-cream-200 px-6 py-4 flex justify-around items-center z-40 pb-safe">
+        <button
+          onClick={() => setActiveTab("orders")}
+          className={`flex flex-col items-center space-y-1 ${
+            activeTab === "orders" ? "text-primary-500" : "text-neutral-400"
+          }`}
+        >
+          <ShoppingBag className="w-6 h-6" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Orders</span>
+        </button>
+        
+        <button
+          onClick={() => setActiveTab("products")}
+          className={`flex flex-col items-center space-y-1 ${
+            activeTab === "products" ? "text-primary-500" : "text-neutral-400"
+          }`}
+        >
+          <Package className="w-6 h-6" />
+          <span className="text-[10px] font-bold uppercase tracking-widest">Products</span>
+        </button>
+      </nav>
+      
+      {/* Add padding to bottom for mobile nav */}
+      <div className="lg:hidden h-24" />
     </div>
   );
 }
