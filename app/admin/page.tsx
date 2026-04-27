@@ -66,6 +66,7 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   
   // Product Form State
@@ -216,6 +217,37 @@ export default function AdminDashboard() {
       sizes: JSON.parse(product.sizes),
     });
     setIsProductModalOpen(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const uploadData = new FormData();
+    uploadData.append("file", file);
+
+    try {
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFormData((prev) => ({
+          ...prev,
+          images: [...prev.images, data.secure_url],
+        }));
+      } else {
+        alert("Upload failed");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Error uploading image");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const resetForm = () => {
@@ -542,38 +574,39 @@ export default function AdminDashboard() {
                 {/* Media & Details */}
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Image URL</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        id="imageUrl"
-                        className="w-full px-6 py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
-                        placeholder="Paste Cloudinary URL here"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const input = document.getElementById("imageUrl") as HTMLInputElement;
-                          if (input.value) {
-                            setFormData({...formData, images: [...formData.images, input.value]});
-                            input.value = "";
-                          }
-                        }}
-                        className="bg-neutral-900 text-white px-4 rounded-2xl hover:bg-primary-500"
-                      >
-                        Add
-                      </button>
+                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Product Images</label>
+                    <div className="flex gap-4">
+                      <label className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-[2rem] p-8 transition-all cursor-pointer ${uploading ? "bg-cream-50 border-cream-200" : "bg-white border-cream-100 hover:border-primary-500 hover:bg-primary-50"}`}>
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                          accept="image/*"
+                          disabled={uploading}
+                        />
+                        {uploading ? (
+                          <div className="flex flex-col items-center">
+                            <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-primary-500">Processing...</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center">
+                            <Upload className="w-8 h-8 text-neutral-400 mb-2 group-hover:text-primary-500" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500">Upload Image</span>
+                          </div>
+                        )}
+                      </label>
                     </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-6 flex flex-wrap gap-4">
                       {formData.images.map((img, i) => (
-                        <div key={i} className="relative w-16 h-16 rounded-xl overflow-hidden border border-cream-200">
+                        <div key={i} className="relative w-24 h-24 rounded-3xl overflow-hidden border border-cream-200 group shadow-sm">
                           <Image src={img} alt="Preview" fill className="object-cover" />
                           <button 
                             type="button"
                             onClick={() => setFormData({...formData, images: formData.images.filter((_, idx) => idx !== i)})}
-                            className="absolute top-0 right-0 bg-rose-500 text-white p-0.5"
+                            className="absolute inset-0 bg-rose-500/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all backdrop-blur-sm"
                           >
-                            <X className="w-3 h-3" />
+                            <Trash2 className="w-5 h-5" />
                           </button>
                         </div>
                       ))}
