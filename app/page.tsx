@@ -105,7 +105,7 @@ export default async function HomePage() {
               </span>
               <h1 className="text-4xl md:text-8xl font-serif font-bold text-white mb-6 md:mb-8 leading-tight drop-shadow-2xl">
                 Welcome to <br />
-                <span className="text-primary-400">Paula&apos;s Palace</span>
+                <span className="text-white">Paula&apos;s Palace</span>
               </h1>
               <p className="text-white/80 text-sm md:text-xl max-w-2xl mx-auto mb-8 md:mb-12 font-medium leading-relaxed drop-shadow-lg px-4">
                 Discover a world of premium fashion for babies, ladies, and the finest kiddies&apos; collections. 

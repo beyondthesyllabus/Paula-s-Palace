@@ -319,125 +319,104 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 lg:p-12 overflow-y-auto">
-        <header className="flex justify-between items-end mb-12">
-          <div>
-            <h1 className="text-4xl font-serif font-bold text-neutral-900 capitalize">{activeTab} Management</h1>
-            <p className="text-neutral-500 mt-2">Oversee your boutique operations</p>
-          </div>
-          
-          {activeTab === "products" && (
-            <button
-              onClick={() => {
-                setEditingProduct(null);
-                resetForm();
-                setIsProductModalOpen(true);
-              }}
-              className="bg-neutral-900 text-white px-8 py-4 rounded-2xl font-bold uppercase tracking-widest flex items-center space-x-3 hover:bg-primary-500 transition-all shadow-xl"
-            >
-              <Plus className="w-5 h-5" />
-              <span>Add Product</span>
-            </button>
-          )}
-        </header>
+      <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto">
+        <div className="max-w-7xl mx-auto">
+          <header className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-8 md:mb-12">
+            <div>
+              <h1 className="text-2xl md:text-4xl font-serif font-bold text-neutral-900 capitalize">{activeTab} Management</h1>
+              <p className="text-sm md:text-base text-neutral-500 mt-2">Oversee your boutique operations</p>
+            </div>
+            
+            {activeTab === "products" && (
+              <button
+                onClick={() => {
+                  setEditingProduct(null);
+                  resetForm();
+                  setIsProductModalOpen(true);
+                }}
+                className="w-full sm:w-auto bg-neutral-900 text-white px-8 py-4 rounded-2xl font-bold uppercase tracking-widest flex items-center justify-center space-x-3 hover:bg-primary-500 transition-all shadow-xl"
+              >
+                <Plus className="w-5 h-5" />
+                <span>Add Product</span>
+              </button>
+            )}
+          </header>
 
         {activeTab === "orders" ? (
           /* Orders Table */
           <div className="bg-white rounded-[2.5rem] shadow-sm border border-cream-200 overflow-hidden">
-            {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[800px] md:min-w-[1000px]">
                 <thead>
                   <tr className="bg-neutral-50 border-b border-cream-100">
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Order #</th>
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Customer</th>
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Total</th>
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Status</th>
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Date</th>
-                    <th className="px-8 py-6 font-bold uppercase tracking-widest text-xs text-neutral-500">Action</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Order #</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Customer</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Total</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Status</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Date</th>
+                    <th className="px-6 md:px-8 py-6 font-bold uppercase tracking-widest text-[10px] text-neutral-500">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-cream-100">
-                  {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-cream-50/50 transition-colors">
-                      <td className="px-8 py-6 font-bold text-neutral-900">{order.orderNumber}</td>
-                      <td className="px-8 py-6">
-                        <p className="font-bold text-neutral-900">{order.customerName}</p>
-                        <p className="text-xs text-neutral-400">{order.customerEmail}</p>
-                      </td>
-                      <td className="px-8 py-6 font-bold text-primary-500">{formatPrice(order.total)}</td>
-                      <td className="px-8 py-6">
-                        <span className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                          order.orderStatus === "delivered" ? "bg-emerald-100 text-emerald-700" :
-                          order.orderStatus === "shipped" ? "bg-blue-100 text-blue-700" :
-                          "bg-amber-100 text-amber-700"
-                        }`}>
-                          {order.orderStatus}
-                        </span>
-                      </td>
-                      <td className="px-8 py-6 text-sm text-neutral-500">{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td className="px-8 py-6">
-                        <button 
-                          onClick={() => setSelectedOrder(order)}
-                          className="text-primary-500 hover:text-primary-600 font-bold uppercase tracking-widest text-xs"
-                        >
-                          Details
-                        </button>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={6} className="py-20 text-center">
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="w-12 h-12 border-4 border-primary-100 border-t-primary-500 rounded-full animate-spin mb-4"></div>
+                          <p className="text-neutral-500 font-bold uppercase tracking-widest text-[10px]">Synchronizing...</p>
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : orders.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-20 text-center">
+                        <div className="w-16 h-16 bg-cream-50 rounded-[1.5rem] flex items-center justify-center mx-auto mb-4">
+                          <ShoppingBag className="w-8 h-8 text-neutral-300" />
+                        </div>
+                        <h3 className="text-lg font-serif font-bold text-neutral-900 mb-1">No Orders Found</h3>
+                        <p className="text-xs text-neutral-500">When customers place orders, they will appear here.</p>
+                      </td>
+                    </tr>
+                  ) : (
+                    orders.map((order) => (
+                      <tr key={order.id} className="hover:bg-cream-50/50 transition-colors">
+                        <td className="px-6 md:px-8 py-6 font-bold text-neutral-900">{order.orderNumber}</td>
+                        <td className="px-6 md:px-8 py-6">
+                          <p className="font-bold text-neutral-900 text-sm">{order.customerName}</p>
+                          <p className="text-[10px] text-neutral-400">{order.customerEmail}</p>
+                        </td>
+                        <td className="px-6 md:px-8 py-6 font-bold text-primary-500">{formatPrice(order.total)}</td>
+                        <td className="px-6 md:px-8 py-6">
+                          <span className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+                            order.orderStatus === "delivered" ? "bg-emerald-100 text-emerald-700" :
+                            order.orderStatus === "shipped" ? "bg-blue-100 text-blue-700" :
+                            "bg-amber-100 text-amber-700"
+                          }`}>
+                            {order.orderStatus}
+                          </span>
+                        </td>
+                        <td className="px-6 md:px-8 py-6 text-xs text-neutral-500 whitespace-nowrap">{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="px-6 md:px-8 py-6">
+                          <button 
+                            onClick={() => setSelectedOrder(order)}
+                            className="text-primary-500 hover:text-primary-600 font-bold uppercase tracking-widest text-[10px] bg-primary-50 px-4 py-2 rounded-lg transition-colors"
+                          >
+                            Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
-
-            {/* Mobile Card View */}
-            <div className="md:hidden divide-y divide-cream-100">
-              {orders.map((order) => (
-                <div key={order.id} className="p-6 space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Order Number</p>
-                      <p className="font-bold text-neutral-900">{order.orderNumber}</p>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-                      order.orderStatus === "delivered" ? "bg-emerald-100 text-emerald-700" :
-                      order.orderStatus === "shipped" ? "bg-blue-100 text-blue-700" :
-                      "bg-amber-100 text-amber-700"
-                    }`}>
-                      {order.orderStatus}
-                    </span>
-                  </div>
-                  
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Customer</p>
-                    <p className="font-bold text-neutral-900">{order.customerName}</p>
-                    <p className="text-xs text-neutral-500">{order.customerEmail}</p>
-                  </div>
-
-                  <div className="flex justify-between items-end pt-2">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Total</p>
-                      <p className="font-bold text-primary-500 text-lg">{formatPrice(order.total)}</p>
-                    </div>
-                    <button 
-                      onClick={() => setSelectedOrder(order)}
-                      className="bg-cream-50 text-primary-500 px-6 py-2 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-primary-50 transition-colors"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {loading && <div className="p-12 text-center text-neutral-400 italic">Synchronizing...</div>}
           </div>
         ) : (
           /* Products Grid/List */
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 md:gap-8">
             {products.map((product) => (
-              <div key={product.id} className="bg-white rounded-[2.5rem] p-6 shadow-sm border border-cream-200 flex gap-8 group hover:shadow-xl transition-all duration-500">
-                <div className="relative w-40 h-48 bg-cream-50 rounded-3xl overflow-hidden shadow-inner flex-shrink-0">
+              <div key={product.id} className="bg-white rounded-[2.5rem] p-4 md:p-6 shadow-sm border border-cream-200 flex flex-col sm:flex-row gap-6 md:gap-8 group hover:shadow-xl transition-all duration-500">
+                <div className="relative w-full sm:w-40 h-64 sm:h-48 bg-cream-50 rounded-3xl overflow-hidden shadow-inner flex-shrink-0">
                   <Image
                     src={JSON.parse(product.images)[0] || "/placeholder.png"}
                     alt={product.name}
@@ -484,59 +463,60 @@ export default function AdminDashboard() {
             ))}
           </div>
         )}
+      </div>
       </main>
 
       {/* Product Modal (Create/Edit) */}
       {isProductModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-4xl rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="p-8 border-b border-cream-100 flex justify-between items-center bg-cream-50/50">
-              <h2 className="text-3xl font-serif font-bold text-neutral-900">
+            <div className="p-6 md:p-8 border-b border-cream-100 flex justify-between items-center bg-cream-50/50">
+              <h2 className="text-xl md:text-3xl font-serif font-bold text-neutral-900">
                 {editingProduct ? "Edit Masterpiece" : "Create New Product"}
               </h2>
               <button 
                 onClick={() => setIsProductModalOpen(false)}
-                className="p-3 hover:bg-white rounded-2xl text-neutral-400 hover:text-neutral-900 transition-all shadow-sm"
+                className="p-2 md:p-3 hover:bg-white rounded-2xl text-neutral-400 hover:text-neutral-900 transition-all shadow-sm"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
             
-            <form onSubmit={handleProductSubmit} className="p-10 overflow-y-auto space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <form onSubmit={handleProductSubmit} className="p-6 md:p-10 overflow-y-auto space-y-6 md:space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 {/* Basic Info */}
-                <div className="space-y-6">
+                <div className="space-y-4 md:space-y-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Product Name</label>
+                    <label className="block text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Product Name</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full px-6 py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
+                      className="w-full px-6 py-3 md:py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
                       placeholder="e.g., Designer Velvet Gown"
                       required
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Price (₦)</label>
+                      <label className="block text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Price (₦)</label>
                       <input
                         type="number"
                         value={formData.price}
                         onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="w-full px-6 py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-6 py-3 md:py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
                         placeholder="0"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Stock</label>
+                      <label className="block text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] text-neutral-500 mb-2">Stock</label>
                       <input
                         type="number"
                         value={formData.stock}
                         onChange={(e) => setFormData({...formData, stock: e.target.value})}
-                        className="w-full px-6 py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
+                        className="w-full px-6 py-3 md:py-4 bg-cream-50 border border-cream-200 rounded-2xl focus:ring-2 focus:ring-primary-500 outline-none"
                         placeholder="100"
                         required
                       />
@@ -656,18 +636,18 @@ export default function AdminDashboard() {
       {selectedOrder && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neutral-900/60 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden max-h-[90vh]">
-            <div className="p-8 border-b border-cream-100 flex justify-between items-center bg-cream-50/50">
+            <div className="p-6 md:p-8 border-b border-cream-100 flex justify-between items-center bg-cream-50/50">
               <div>
-                <h2 className="text-2xl font-serif font-bold text-neutral-900">Order {selectedOrder.orderNumber}</h2>
-                <p className="text-xs text-neutral-400 uppercase tracking-widest mt-1">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
+                <h2 className="text-xl md:text-2xl font-serif font-bold text-neutral-900">Order {selectedOrder.orderNumber}</h2>
+                <p className="text-[10px] text-neutral-400 uppercase tracking-widest mt-1">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
               </div>
-              <button onClick={() => setSelectedOrder(null)} className="p-3 hover:bg-white rounded-2xl text-neutral-400">
+              <button onClick={() => setSelectedOrder(null)} className="p-2 md:p-3 hover:bg-white rounded-2xl text-neutral-400">
                 <X className="w-6 h-6" />
               </button>
             </div>
             
-            <div className="p-10 space-y-8 overflow-y-auto max-h-[60vh]">
-              <div className="grid grid-cols-2 gap-8">
+            <div className="p-6 md:p-10 space-y-6 md:space-y-8 overflow-y-auto max-h-[60vh]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
                 <div>
                   <h3 className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-3">Customer</h3>
                   <p className="font-bold text-neutral-900">{selectedOrder.customerName}</p>
