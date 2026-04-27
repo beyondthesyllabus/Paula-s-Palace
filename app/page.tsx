@@ -141,9 +141,9 @@ export default async function HomePage() {
       </section>
 
       {/* Professional Categories Section */}
-      <section className="bg-white py-24" id="collections">
+      <section className="bg-white pt-24 pb-12" id="collections">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal>
+          <Reveal width="100%">
             <div className="text-center mb-20">
               <span className="text-gold-600 font-bold tracking-[0.3em] uppercase text-xs mb-4 block">
                 Boutique Selection
@@ -160,7 +160,7 @@ export default async function HomePage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category, index) => (
-              <Reveal key={category.id} delay={0.1 * index}>
+              <Reveal key={category.id} delay={0.1 * index} width="100%">
                 <Link
                   href={`/category/${category.slug}`}
                   className="group relative h-80 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-700 block"
@@ -196,7 +196,7 @@ export default async function HomePage() {
 
       {/* Featured Products */}
       {featuredProducts.length > 0 && (
-        <section className="bg-white py-24 border-y border-cream-200">
+        <section className="bg-cream-50/50 py-16 border-y border-cream-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal>
               <div className="flex justify-between items-end mb-16">
@@ -217,7 +217,7 @@ export default async function HomePage() {
               {featuredProducts.map((product, index) => {
                 const images = JSON.parse(product.images);
                 return (
-                  <Reveal key={product.id} delay={0.1 * index}>
+                  <Reveal key={product.id} delay={0.1 * index} width="100%">
                     <Link
                       href={`/product/${product.slug}`}
                       className="group block"
